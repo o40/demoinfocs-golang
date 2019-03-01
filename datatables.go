@@ -186,8 +186,15 @@ func (p *Parser) bindNewPlayer(playerEntity *st.Entity) {
 	} else {
 		pl = common.NewPlayer()
 		p.gameState.playersByEntityID[playerIndex] = pl
-		pl.SteamID = -1
-		pl.Name = "unconnected"
+
+		rp := p.rawPlayers[playerIndex-1]
+		pl.Name = rp.name
+		pl.SteamID = rp.xuid
+		pl.IsBot = rp.isFakePlayer
+		pl.AdditionalPlayerInformation = &p.additionalPlayerInfo[pl.EntityID]
+
+		p.gameState.playersByUserID[rp.userID] = pl
+		pl.UserID = rp.userID
 	}
 
 	pl.EntityID = playerEntity.ID()
@@ -198,7 +205,12 @@ func (p *Parser) bindNewPlayer(playerEntity *st.Entity) {
 	})
 
 	// Position
-	playerEntity.BindPosition(&pl.Position)
+	playerEntity.OnPositionUpdate(func(pos r3.Vector) {
+		pl.Position = pos
+		if pl.IsAlive() {
+			pl.LastAlivePosition = pos
+		}
+	})
 
 	// General info
 	playerEntity.FindProperty("m_iTeamNum").OnUpdate(func(val st.PropertyValue) {
@@ -279,6 +291,10 @@ func (p *Parser) bindNewPlayer(playerEntity *st.Entity) {
 		}
 		pl.IsDefusing = val.IntVal != 0
 	})
+
+	if pl.SteamID != 0 {
+		p.eventDispatcher.Dispatch(events.PlayerConnect{Player: pl})
+	}
 }
 
 func (p *Parser) bindWeapons() {
