@@ -71,14 +71,51 @@ func TestPlayerFlashed_FlashDuration_Over(t *testing.T) {
 	assert.False(t, pl.IsBlinded(), "Should not be flashed")
 }
 
+func TestPlayer_FlashDurationTime_Default(t *testing.T) {
+	pl := newPlayer()
+
+	assert.Equal(t, time.Duration(0), pl.FlashDurationTime())
+}
+
 func TestPlayer_FlashDurationTime(t *testing.T) {
-	p := newPlayer()
+	pl := newPlayer()
 
-	assert.Equal(t, time.Duration(0), p.FlashDurationTime())
+	pl.FlashDuration = 2.3
 
-	p.FlashDuration = 2.3
+	assert.Equal(t, 2300*time.Millisecond, pl.FlashDurationTime())
+}
 
-	assert.Equal(t, 2300*time.Millisecond, p.FlashDurationTime())
+func TestPlayer_FlashDurationTimeRemaining_Default(t *testing.T) {
+	pl := newPlayer()
+
+	assert.Equal(t, time.Duration(0), pl.FlashDurationTimeRemaining())
+}
+
+func TestPlayer_FlashDurationTimeRemaining(t *testing.T) {
+	pl := newPlayer()
+
+	pl.FlashDuration = 3
+	pl.FlashTick = 128
+	*pl.ingameTick = 128 * 2
+	assert.Equal(t, 2*time.Second, pl.FlashDurationTimeRemaining())
+}
+
+func TestPlayer_FlashDurationTimeRemaining_Zero(t *testing.T) {
+	pl := newPlayer()
+
+	pl.FlashDuration = 3
+	pl.FlashTick = 128
+	*pl.ingameTick = 128 * 4
+	assert.Equal(t, time.Duration(0), pl.FlashDurationTimeRemaining())
+}
+
+func TestPlayer_FlashDurationTimeRemaining_FlashDuration_Over(t *testing.T) {
+	pl := newPlayer()
+
+	pl.FlashDuration = 1
+	pl.FlashTick = 128
+	*pl.ingameTick = 128 * 4
+	assert.Equal(t, time.Duration(0), pl.FlashDurationTimeRemaining())
 }
 
 func newPlayer() *Player {
