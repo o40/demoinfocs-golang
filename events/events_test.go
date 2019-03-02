@@ -10,7 +10,8 @@ import (
 )
 
 func TestPlayerFlashed_FlashDuration(t *testing.T) {
-	p := common.NewPlayer()
+	tick := 0
+	p := common.NewPlayer(128, &tick)
 	e := PlayerFlashed{Player: p}
 
 	assert.Equal(t, time.Duration(0), e.FlashDuration())

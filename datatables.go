@@ -184,7 +184,7 @@ func (p *Parser) bindNewPlayer(playerEntity *st.Entity) {
 	if p.gameState.playersByEntityID[playerIndex] != nil {
 		pl = p.gameState.playersByEntityID[playerIndex]
 	} else {
-		pl = common.NewPlayer()
+		pl = common.NewPlayer(p.header.TickRate(), &p.gameState.ingameTick)
 		p.gameState.playersByEntityID[playerIndex] = pl
 		pl.SteamID = -1
 		pl.Name = "unconnected"
@@ -214,7 +214,14 @@ func (p *Parser) bindNewPlayer(playerEntity *st.Entity) {
 
 	playerEntity.BindProperty("m_angEyeAngles[1]", &pl.ViewDirectionX, st.ValTypeFloat32)
 	playerEntity.BindProperty("m_angEyeAngles[0]", &pl.ViewDirectionY, st.ValTypeFloat32)
-	playerEntity.BindProperty("m_flFlashDuration", &pl.FlashDuration, st.ValTypeFloat32)
+	playerEntity.FindProperty("m_flFlashDuration").OnUpdate(func(val st.PropertyValue) {
+		if val.FloatVal == 0 {
+			pl.FlashTick = 0
+		} else {
+			pl.FlashTick = p.gameState.ingameTick
+		}
+		pl.FlashDuration = val.FloatVal
+	})
 
 	// Velocity
 	playerEntity.BindProperty("localdata.m_vecVelocity[0]", &pl.Velocity.X, st.ValTypeFloat64)

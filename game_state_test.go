@@ -41,8 +41,8 @@ func TestGameState_Participants(t *testing.T) {
 	byUserID := ptcp.ByUserID()
 
 	// Should update ptcp as well since it uses the same map
-	gs.playersByEntityID[0] = common.NewPlayer()
-	gs.playersByUserID[0] = common.NewPlayer()
+	gs.playersByEntityID[0] = &common.Player{}
+	gs.playersByUserID[0] = &common.Player{}
 
 	assert.Equal(t, gs.playersByEntityID, ptcp.ByEntityID())
 	assert.Equal(t, gs.playersByUserID, ptcp.ByUserID())
@@ -54,7 +54,7 @@ func TestGameState_Participants(t *testing.T) {
 
 func TestParticipants_All(t *testing.T) {
 	gs := newGameState()
-	pl := common.NewPlayer()
+	pl := &common.Player{}
 	gs.playersByUserID[0] = pl
 
 	allPlayers := gs.Participants().All()
@@ -65,19 +65,19 @@ func TestParticipants_All(t *testing.T) {
 func TestParticipants_Playing(t *testing.T) {
 	gs := newGameState()
 
-	terrorist := common.NewPlayer()
+	terrorist := &common.Player{}
 	terrorist.Team = common.TeamTerrorists
 	gs.playersByUserID[0] = terrorist
-	ct := common.NewPlayer()
+	ct := &common.Player{}
 	ct.Team = common.TeamCounterTerrorists
 	gs.playersByUserID[1] = ct
-	unassigned := common.NewPlayer()
+	unassigned := &common.Player{}
 	unassigned.Team = common.TeamUnassigned
 	gs.playersByUserID[2] = unassigned
-	spectator := common.NewPlayer()
+	spectator := &common.Player{}
 	spectator.Team = common.TeamSpectators
 	gs.playersByUserID[3] = spectator
-	def := common.NewPlayer()
+	def := &common.Player{}
 	gs.playersByUserID[4] = def
 
 	playing := gs.Participants().Playing()
@@ -89,19 +89,19 @@ func TestParticipants_Playing(t *testing.T) {
 func TestParticipants_TeamMembers(t *testing.T) {
 	gs := newGameState()
 
-	terrorist := common.NewPlayer()
+	terrorist := &common.Player{}
 	terrorist.Team = common.TeamTerrorists
 	gs.playersByUserID[0] = terrorist
-	ct := common.NewPlayer()
+	ct := &common.Player{}
 	ct.Team = common.TeamCounterTerrorists
 	gs.playersByUserID[1] = ct
-	unassigned := common.NewPlayer()
+	unassigned := &common.Player{}
 	unassigned.Team = common.TeamUnassigned
 	gs.playersByUserID[2] = unassigned
-	spectator := common.NewPlayer()
+	spectator := &common.Player{}
 	spectator.Team = common.TeamSpectators
 	gs.playersByUserID[3] = spectator
-	def := common.NewPlayer()
+	def := &common.Player{}
 	gs.playersByUserID[4] = def
 
 	cts := gs.Participants().TeamMembers(common.TeamCounterTerrorists)
@@ -112,7 +112,7 @@ func TestParticipants_TeamMembers(t *testing.T) {
 func TestParticipants_FindByHandle(t *testing.T) {
 	gs := newGameState()
 
-	pl := common.NewPlayer()
+	pl := &common.Player{}
 	pl.Team = common.TeamTerrorists
 	gs.playersByEntityID[3000&entityHandleIndexMask] = pl
 
@@ -124,7 +124,7 @@ func TestParticipants_FindByHandle(t *testing.T) {
 func TestParticipants_FindByHandle_InvalidEntityHandle(t *testing.T) {
 	gs := newGameState()
 
-	pl := common.NewPlayer()
+	pl := &common.Player{}
 	pl.Team = common.TeamTerrorists
 	gs.playersByEntityID[invalidEntityHandle&entityHandleIndexMask] = pl
 

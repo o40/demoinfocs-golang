@@ -51,10 +51,11 @@ func TestParseNextFrameEvents(t *testing.T) {
 
 func kill(wepType common.EquipmentElement) events.Kill {
 	wep := common.NewEquipment(wepType)
+	tick := 0
 	return events.Kill{
-		Killer: common.NewPlayer(),
+		Killer: common.NewPlayer(128, &tick),
 		Weapon: &wep,
-		Victim: common.NewPlayer(),
+		Victim: common.NewPlayer(128, &tick),
 	}
 }
 

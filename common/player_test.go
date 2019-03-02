@@ -12,7 +12,7 @@ func TestPlayerActiveWeapon(t *testing.T) {
 	glock := NewEquipment(EqGlock)
 	ak47 := NewEquipment(EqAK47)
 
-	pl := NewPlayer()
+	pl := newPlayer()
 	pl.RawWeapons[1] = &knife
 	pl.RawWeapons[2] = &glock
 	pl.RawWeapons[3] = &ak47
@@ -20,12 +20,13 @@ func TestPlayerActiveWeapon(t *testing.T) {
 
 	assert.Equal(t, &ak47, pl.ActiveWeapon(), "Should have AK-47 equipped")
 }
+
 func TestPlayerWeapons(t *testing.T) {
 	knife := NewEquipment(EqKnife)
 	glock := NewEquipment(EqGlock)
 	ak47 := NewEquipment(EqAK47)
 
-	pl := NewPlayer()
+	pl := newPlayer()
 	pl.RawWeapons[1] = &knife
 	pl.RawWeapons[2] = &glock
 	pl.RawWeapons[3] = &ak47
@@ -35,7 +36,7 @@ func TestPlayerWeapons(t *testing.T) {
 }
 
 func TestPlayerAlive(t *testing.T) {
-	pl := NewPlayer()
+	pl := newPlayer()
 
 	pl.Hp = 100
 	assert.Equal(t, true, pl.IsAlive(), "Should be alive")
@@ -51,20 +52,36 @@ func TestPlayerAlive(t *testing.T) {
 }
 
 func TestPlayerFlashed(t *testing.T) {
-	pl := NewPlayer()
+	pl := newPlayer()
 
 	assert.False(t, pl.IsBlinded(), "Should not be flashed")
 
 	pl.FlashDuration = 2.3
+	pl.FlashTick = 50
+	*pl.ingameTick = 128
 	assert.True(t, pl.IsBlinded(), "Should be flashed")
 }
 
+func TestPlayerFlashed_FlashDuration_Over(t *testing.T) {
+	pl := newPlayer()
+
+	pl.FlashDuration = 1.9
+	pl.FlashTick = 128
+	*pl.ingameTick = 128 * 3
+	assert.False(t, pl.IsBlinded(), "Should not be flashed")
+}
+
 func TestPlayer_FlashDurationTime(t *testing.T) {
-	p := NewPlayer()
+	p := newPlayer()
 
 	assert.Equal(t, time.Duration(0), p.FlashDurationTime())
 
 	p.FlashDuration = 2.3
 
 	assert.Equal(t, 2300*time.Millisecond, p.FlashDurationTime())
+}
+
+func newPlayer() *Player {
+	tick := 0
+	return NewPlayer(128, &tick)
 }
