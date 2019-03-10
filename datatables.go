@@ -202,6 +202,7 @@ func (p *Parser) bindNewPlayer(playerEntity *st.Entity) {
 
 	playerEntity.OnDestroy(func() {
 		delete(p.gameState.playersByEntityID, pl.EntityID)
+		delete(p.gameState.playersByUserID, pl.UserID)
 	})
 
 	// Position
