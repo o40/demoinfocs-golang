@@ -190,7 +190,7 @@ func (p *Parser) bindNewPlayer(playerEntity *st.Entity) {
 		rp := p.rawPlayers[playerIndex-1]
 		pl.Name = rp.name
 		pl.SteamID = rp.xuid
-		pl.IsBot = rp.isFakePlayer
+		pl.IsBot = rp.isFakePlayer || rp.guid == "BOT"
 		pl.AdditionalPlayerInformation = &p.additionalPlayerInfo[pl.EntityID]
 
 		p.gameState.playersByUserID[rp.userID] = pl
